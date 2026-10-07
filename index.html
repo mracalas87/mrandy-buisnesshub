@@ -203,6 +203,18 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; h
 
 <div class="screen" id="plan-screen">
 
+  <!-- Yesterday result banner - hidden on day 1 -->
+  <div id="yesterday-banner" style="display:none;background:linear-gradient(135deg,#1e3a5f,#2a4f7c);border-radius:14px;padding:14px 18px;margin-bottom:8px;display:none;align-items:center;justify-content:space-between;gap:12px;border:1px solid rgba(245,200,0,.25);">
+    <div>
+      <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.5);margin-bottom:3px;">Yesterday</div>
+      <div id="yesterday-text" style="font-size:.95rem;font-weight:800;color:#fff;line-height:1.4;"></div>
+    </div>
+    <div style="text-align:right;flex-shrink:0;">
+      <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.5);margin-bottom:3px;">New balance</div>
+      <div id="yesterday-balance" style="font-size:1.3rem;font-weight:900;color:var(--yellow);">€0.00</div>
+    </div>
+  </div>
+
   <div class="weather-strip">
     <div class="weather-info">
       <div class="weather-emoji" id="weather-emoji">☀️</div>
@@ -552,6 +564,19 @@ function initDay(){
   drawChart();
   showScreen('plan-screen');
   setTimeout(drawWeatherCanvas,50);
+  // Yesterday banner
+  const banner=document.getElementById('yesterday-banner');
+  if(G._yesterday && G.day>1){
+    const y=G._yesterday;
+    const profWord=y.profit>=0?'made':'lost';
+    const sign=y.profit>=0?'+':'';
+    document.getElementById('yesterday-text').innerHTML=
+      `Day ${y.day}: you ${profWord} <strong>${sign}€${fmt(y.profit)}</strong> - that has been added to your fund.`;
+    document.getElementById('yesterday-balance').textContent='€'+fmt(y.balance);
+    banner.style.display='flex';
+  } else {
+    banner.style.display='none';
+  }
 }
 
 function updateCostSummary(){
@@ -1083,11 +1108,16 @@ function endSim(){
 // NEXT DAY
 // ══════════════════════════════════════
 function nextDay(){
+  // Hide the result overlay immediately before transitioning
+  document.getElementById('sim-result').style.display='none';
   const reason='';
   const r=G._lastResult;
   const entry={ day:G.day, weather:G.weather.label, price:r.price, sold:r.sold, profit:r.profit, reason:reason||'(no reflection entered)', balance:G.balance };
   G.log.push(entry);
   addLogEntry(entry);
+
+  // Store yesterday's result for the banner
+  G._yesterday = { day:G.day, profit:r.profit, balance:G.balance };
 
   G.day++;
   if(G.day>30){ showGameOver(); return; }
