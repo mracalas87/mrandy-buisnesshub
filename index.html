@@ -126,7 +126,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; h
 .ticker-text { flex:1; }
 
 /* Results overlay */
-.sim-result { background:var(--white); border-radius:14px; padding:22px; box-shadow:0 4px 16px rgba(0,0,0,.12); display:none; }
+.sim-result { background:var(--white); border-radius:14px; padding:22px; box-shadow:0 4px 16px rgba(0,0,0,.12); }
 .sim-result.show { display:block; }
 .result-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:14px 0; }
 .result-stat { text-align:center; }
@@ -384,31 +384,31 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; h
       <div class="ticker-text" id="ticker-text">Setting up the stand...</div>
     </div>
 
-    <!-- Result panel stays in sim-screen but hidden until endSim -->
-    <div class="sim-result" id="sim-result" style="display:none;position:fixed;inset:0;z-index:100;background:rgba(26,46,74,.88);align-items:center;justify-content:center;padding:20px;">
-      <div style="background:white;border-radius:20px;padding:32px 28px;max-width:400px;width:100%;box-shadow:0 12px 48px rgba(0,0,0,.35);text-align:center;">
-        <div style="font-size:1.2rem;font-weight:900;color:var(--navy);margin-bottom:16px;" id="result-title-txt"></div>
-        <div class="result-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;">
-          <div class="result-stat" style="background:#f5f7fa;border-radius:10px;padding:12px 8px;">
-            <div class="val" id="r-sold" style="font-size:1.6rem;font-weight:900;color:var(--navy);">0</div>
-            <div class="lbl" style="font-size:.68rem;color:#888;text-transform:uppercase;margin-top:2px;">Cups Sold</div>
-          </div>
-          <div class="result-stat" style="background:#f5f7fa;border-radius:10px;padding:12px 8px;">
-            <div class="val" id="r-revenue" style="font-size:1.6rem;font-weight:900;color:var(--navy);">€0</div>
-            <div class="lbl" style="font-size:.68rem;color:#888;text-transform:uppercase;margin-top:2px;">Revenue</div>
-          </div>
-          <div class="result-stat" style="background:#f5f7fa;border-radius:10px;padding:12px 8px;">
-            <div class="val" id="r-profit" style="font-size:1.6rem;font-weight:900;color:var(--lime);">+€0</div>
-            <div class="lbl" style="font-size:.68rem;color:#888;text-transform:uppercase;margin-top:2px;">Profit</div>
-          </div>
-        </div>
-        <div id="result-msg" style="font-size:.82rem;color:var(--grey);margin-bottom:18px;line-height:1.5;"></div>
-        <button onclick="nextDay()" style="width:100%;padding:16px;background:var(--yellow);color:var(--navy);border:none;border-radius:12px;font-size:1.1rem;font-weight:900;cursor:pointer;letter-spacing:.3px;">
-          Next Day → Day <span id="next-day-num">2</span>
-        </button>
+  </div>
+</div>
+
+<!-- Result overlay - lives outside all screens so position:fixed works cleanly -->
+<div id="sim-result" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(26,46,74,.92);align-items:center;justify-content:center;padding:20px;">
+  <div style="background:white;border-radius:20px;padding:32px 28px;max-width:400px;width:100%;box-shadow:0 12px 48px rgba(0,0,0,.35);text-align:center;">
+    <div style="font-size:1.2rem;font-weight:900;color:var(--navy);margin-bottom:16px;" id="result-title-txt"></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;">
+      <div style="background:#f5f7fa;border-radius:10px;padding:12px 8px;">
+        <div id="r-sold" style="font-size:1.6rem;font-weight:900;color:var(--navy);">0</div>
+        <div style="font-size:.68rem;color:#888;text-transform:uppercase;margin-top:2px;">Cups Sold</div>
+      </div>
+      <div style="background:#f5f7fa;border-radius:10px;padding:12px 8px;">
+        <div id="r-revenue" style="font-size:1.6rem;font-weight:900;color:var(--navy);">€0</div>
+        <div style="font-size:.68rem;color:#888;text-transform:uppercase;margin-top:2px;">Revenue</div>
+      </div>
+      <div style="background:#f5f7fa;border-radius:10px;padding:12px 8px;">
+        <div id="r-profit" style="font-size:1.6rem;font-weight:900;color:var(--lime);">+€0</div>
+        <div style="font-size:.68rem;color:#888;text-transform:uppercase;margin-top:2px;">Profit</div>
       </div>
     </div>
-
+    <div id="result-msg" style="font-size:.82rem;color:var(--grey);margin-bottom:18px;line-height:1.5;"></div>
+    <button onclick="nextDay()" style="width:100%;padding:18px;background:var(--yellow);color:var(--navy);border:none;border-radius:12px;font-size:1.15rem;font-weight:900;cursor:pointer;">
+      Next Day → Day <span id="next-day-num">2</span>
+    </button>
   </div>
 </div>
 
@@ -757,19 +757,22 @@ function updateCustomers(){
         if(c.willBuy && G.stock.cups>0){
           c.state='buying';
           c.buyTimer=30;
-          // Deduct stock
           G.stock.cups   = Math.max(0,G.stock.cups-1);
           G.stock.lemons = Math.max(0,G.stock.lemons-G.lpc);
           G.stock.sugar  = Math.max(0,G.stock.sugar-G.spc);
           G.stock.ice    = Math.max(0,G.stock.ice-G.ipc);
           G.simSold++;
           G.simRevenue += G.price;
+          G.satHappy++;
           c.bubble = c.happy? '😊' : G.rqScore<0.4? '😐' : '🙂';
           c.bubbleTimer=50;
           updateStockBars();
         } else {
           c.state='leaving';
-          c.bubble = G.stock.cups===0?'😞':'🤔';
+          if(G.stock.cups===0){ c.bubble='😞'; G.satSoldout++; }
+          else if(!c.willBuy && G.price>0.9){ c.bubble='💸'; G.satPrice++; }
+          else if(!c.willBuy && G.rqScore<0.5){ c.bubble='🤢'; G.satTaste++; }
+          else { c.bubble='🤔'; G.satOther=G.satOther||0; G.satOther++; }
           c.bubbleTimer=35;
         }
       }
