@@ -157,7 +157,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; h
 <header>
   <h1>🍋 Mr Andy's Lemonade Stand</h1>
   <div class="header-stats">
-    <div class="stat-pill">Day <span id="h-day">1</span>/30</div>
+    <div class="stat-pill">Day <span id="h-day">1</span>/14</div>
     <div class="stat-pill">💰 €<span id="h-balance">10.00</span></div>
   </div>
 </header>
@@ -226,7 +226,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; h
     <div>
       <div class="day-prog-wrap">
         <div class="day-prog-bg"><div class="day-prog-fill" id="day-bar" style="width:3.3%"></div></div>
-        <div class="day-prog-lbl">Day <span id="day-label-n">1</span> of 30</div>
+        <div class="day-prog-lbl">Day <span id="day-label-n">1</span> of 14</div>
       </div>
       <div class="demand-meter" style="margin-top:8px">
         <div class="demand-label">Est. Demand</div>
@@ -419,7 +419,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; h
 <div class="screen" id="over-screen">
   <div style="background:white;border-radius:18px;padding:36px 32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.2)">
     <div style="font-size:3rem">🏆</div>
-    <h2 style="font-size:2rem;font-weight:900;color:var(--navy);margin-top:8px">30 Days Complete!</h2>
+    <h2 style="font-size:2rem;font-weight:900;color:var(--navy);margin-top:8px">14 Days Complete!</h2>
     <div style="font-size:.9rem;color:var(--grey);margin-top:4px">Your final score:</div>
     <div style="font-size:3.5rem;font-weight:900;color:var(--lime);margin:10px 0" id="final-score">€0.00</div>
     <div style="text-align:left;margin-top:20px">
@@ -563,7 +563,7 @@ function initDay(){
   document.getElementById('h-day').textContent = G.day;
   document.getElementById('h-balance').textContent = fmt(G.balance);
   document.getElementById('day-label-n').textContent = G.day;
-  document.getElementById('day-bar').style.width = ((G.day/30)*100)+'%';
+  document.getElementById('day-bar').style.width = ((G.day/14)*100)+'%';
 
   G.satHappy=0; G.satPrice=0; G.satTaste=0; G.satSoldout=0; G.profitHistory=[];
   updateCostSummary();
@@ -1142,7 +1142,7 @@ function nextDay(){
   } catch(e){}
 
   G.day++;
-  if(G.day>30){ showGameOver(); return; }
+  if(G.day>14){ showGameOver(); return; }
   initDay();
   window.scrollTo({top:0, behavior:'smooth'});
 }
