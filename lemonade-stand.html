@@ -677,11 +677,15 @@ function startSim(){
   // Compute total customers for the day (done upfront, revealed progressively)
   const rqScore = recipeQuality(lpc,spc,ipc);
   const priceEffect = Math.max(0,1-Math.pow(Math.max(0,price-0.15)/1.5,1.4));
-  const effectiveDemand = G.weather.demand * priceEffect * rqScore;
-  const maxC = Math.round(30*effectiveDemand);
+  // Footfall: weather drives how many people pass by (recipe/price have weaker influence on foot traffic)
+  const footfallDemand = G.weather.demand * (0.5 + 0.5*priceEffect*rqScore);
+  const maxC = Math.round(40*footfallDemand);
   const rf = 0.8+Math.random()*0.4;
   G.totalCustomers = Math.round(maxC*rf);
-  G.totalWillBuy = Math.min(canMake, G.totalCustomers);
+  // Conversion: of those who arrive, only some actually buy based on price+recipe appeal
+  const conversionRate = priceEffect * rqScore;
+  const willBuyCount = Math.round(G.totalCustomers * conversionRate * (0.85 + Math.random()*0.3));
+  G.totalWillBuy = Math.min(canMake, willBuyCount);
   G.customersSeen = 0;
   G.rqScore = rqScore;
 
@@ -785,9 +789,9 @@ function updateCustomers(){
           updateStockBars();
         } else {
           c.state='leaving';
-          if(G.stock.cups===0){ c.bubble='😞'; G.satSoldout++; }
-          else if(!c.willBuy && G.price>0.9){ c.bubble='💸'; G.satPrice++; }
+          if(G.stock.cups===0){ c.bubble='😠'; G.satSoldout++; }
           else if(!c.willBuy && G.rqScore<0.5){ c.bubble='🤢'; G.satTaste++; }
+          else if(!c.willBuy && G.price>0.6){ c.bubble='💸'; G.satPrice++; }
           else { c.bubble='🤔'; G.satOther=G.satOther||0; G.satOther++; }
           c.bubbleTimer=35;
         }
